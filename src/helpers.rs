@@ -9,12 +9,14 @@ use semver_parser::version::Version;
 /// The common result type, our errors will be simple strings.
 pub type Result<T> = result::Result<T, String>;
 
-/// Return all data from `path`.
+/// Return all data from `path`. Line boundaries are normalized from
+/// "\r\n" to "\n" to make sure "^" and "$" will match them. See
+/// https://github.com/rust-lang/regex/issues/244 for details.
 pub fn read_file(path: &str) -> io::Result<String> {
     let mut file = File::open(path)?;
     let mut buf = String::new();
     file.read_to_string(&mut buf)?;
-    Ok(buf)
+    Ok(buf.replace("\r\n", "\n"))
 }
 
 /// Indent every line in text by four spaces.
